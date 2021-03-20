@@ -1,8 +1,11 @@
 # Simple Math
-This package presents and demos techniques for building a `Python` package.
+This repo presents and demos techniques for building a `python` package. To install this demonstration package, download and run at the root folder
+```bash
+pip install .
+```
 
 ### `pip install .` vs `python setup.py install`
-To install a `Python` package from the source, run
+To install a `python` package from the source, `pip` command is
 ```bash
 pip install <path_to_package>
 ```
@@ -16,23 +19,6 @@ Alternative command to build a package from the source is `python install setup.
 ```python
 import setuptools
 setuptools.setup()
-```
-
-### \_\_main\_\_ file
-To be able to run a command like
-```bash
-python -m <packagename>
-```
-it requires `__main__.py` file to exist. The scripts in the file will be executed when running command above. This mechanism is like a `python` module having lines like
-```python
-if __name__ == '__main__':
-    # script block
-```
-The script block will be executed by `python -m <python_module>`. The file `__main__.py` is like the version for a package.
-
-This package has the feature of `__main__.py` implemented and invoked after installation as
-```bash
-python -m simplemath
 ```
 
 ### install_requires vs requirement.txt
@@ -53,8 +39,49 @@ see an example at [requirements.txt](requirements.txt) and [setup.cfg](setup.cfg
 
 In a data science pipeline, to enable reproducibility, it is critical to have `requirements.txt` track the exact version of all dependence.
 
+### package data
+If a package requires data to come with, this can be specified at `setup.cfg` as
+- In [options] section, `include_package_data = True`
+- In [options.package_data] section, declare location of the data files relative to the root folder that contains `setup.cfg`
+
+see [setup.cfg](setup.cfg) for an example. To load the data to the package code, the package `pkg_resources` distributed with `setuptools` plays a role; see [print_numbers.py](simplemath/print_numbers.py) for an example.
+
+
+### entry point
+`setuptools` provides entry point mechanism to wrap function in the package into standalone CLI command in the installation process. One package can have multiple entry points, i.e., installation generates multiple CLI commands. The entry points can be defined at `setup.cfg`; see [setup.cfg](setup.cfg) for an example.
+
+- The CLI commands generated will only exist in the environment where the package is installed.
+
+- Entry point points to a specific function in the package. `hello = simplemath.hello:hello` is essentially equivalent to:
+```python
+import sys
+from simplemath.hello import hello
+if __name__ == '__main__':
+    sys.exit(hello())
+```
+
+- If the function takes parameters from `sys.args`, then corresponding CLI command created will follow; see [hello.py](simplemath/hello.py) for an simple implemented by `click`.
+
+
+### \_\_main\_\_ file
+To be able to run a command like
+```bash
+python -m <packagename>
+```
+it requires `__main__.py` file to exist. The scripts in the file will be executed when running command above. This mechanism is like a `python` module having lines like
+```python
+if __name__ == '__main__':
+    # script block
+```
+The script block will be executed by `python -m <python_module>`. The file `__main__.py` is like the version for a package.
+
+This package has the feature of `__main__.py` implemented and invoked after installation as
+```bash
+python -m simplemath
+```
+
 ### package test
-Package requires test module to ensure that all code pass quality standards. In package installation, testing component is not mandatory. But it is a good (in fact, must-have) practice to get installed package tested in different environments before distribution. This process contains two logic parts that fulfilled by two `python` tools:
+Package requires test module to ensure that all code pass quality standards. In package installation, testing component is not mandatory. But it is a good (in fact, must-have) practice to get installed package tested in different environments before distribution. This process contains two logic parts that can fulfilled by two commonly used `python` tools:
 
 - `tox` - automatically create specified isolated environments, install required dependence and launch testing commands.
 - `pytest` - execute testing cases implemented in its framework.
