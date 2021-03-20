@@ -52,3 +52,13 @@ A good practice for the use of these two places to track package dependence is:
 see an example at [requirements.txt](requirements.txt) and [setup.cfg](setup.cfg).
 
 In a data science pipeline, to enable reproducibility, it is critical to have `requirements.txt` track the exact version of all dependence.
+
+### package test
+Package requires test module to ensure that all code pass quality standards. In package installation, testing component is not mandatory. But it is a good (in fact, must-have) practice to get installed package tested in different environments before distribution. This process contains two logic parts that fulfilled by two `python` tools:
+
+- `tox` - automatically create specified isolated environments, install required dependence and launch testing commands.
+- `pytest` - execute testing cases implemented in its framework.
+
+`tox` tool can be installed by running `pip install tox`. After the installation, command `tox` is supposed to run at the folder where it contains setup file (`setup.cfg`and/or `setup.py`) and `tox.ini`. The file `tox.ini` provides the configuration for `tox` execution. The command to invoke testing is also specified in `tox.ini` file; see [tox.ini](tox.ini) for an example.
+
+In `tox.ini`, the dependency for running test can be provided. Note that the dependency given by `install_requires` in setup file will be automatically installed by `tox` into isolated testing environments as well.
