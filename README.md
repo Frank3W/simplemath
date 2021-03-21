@@ -1,43 +1,57 @@
 # Simple Math
-This repo presents and demos techniques for building a `python` package. To install this demonstration package, download and run at the root folder
+This repo presents and demos how to build a `python` package to distribute and share with others via package installation. The key elements for creating an installable `python` package are covered. The good practices regarding those elements are discussed as well.
+
+This repo contains the source code of an installable `simplemath` package for demonstration purpose. This package can be installed by running the `pip` command at the root folder
 ```bash
 pip install .
 ```
 
-### `pip install .` vs `python setup.py install`
-To install a `python` package from the source, `pip` command is
-```bash
-pip install <path_to_package>
-```
-where `<path_to_package>` folder contains the source code and setup files: `setup.cfg` and `setup.py`. It will invoke the `setuptool` library to build the package, which is reflected in `pyproject.toml`.
+### setup files
+To make a package installable, it requires the existence of a combination of files from `setup.py`, `setpu.cfg` and `pyproject.toml` at the root folder of the repo. Those files provide the configuration for package installation.
 
-Alternative command to build a package from the source is `python install setup.py`. But `pip install` is a better solution since `pip` is better at managing and resolving package dependence.
+The following are two alternative minimal combinations required for installation:
+- `setup.py`
+- `setup.cfg` and `pyproject.toml`
 
-### `setup.py` and `setup.cfg`.
-`setuptools` is in the transition from `setup.py` to `setup.cfg` where `setup.cfg` will contain static setup but `setup.py` will contain dynamic setup. Even when all setup contents are static, it is still useful to have `setup.py` there to enable `pip install -e` to launch develop mode as below
+Installation will invoke package `setuptools` for the execution to build. In the latest version of `setuptools`, it is recommended to have all these 3 files for the separate purposes
+- `pyproject.toml` makes system build tools explicit; see [pyproject.toml](pyproject.toml) that is sufficient for most projects.
+- `setup.cfg` contains static configuration and provides default values for setup entries.
+- `setup.py` contains dynamic setup configuration that can be based on user inputs or local environments.
+
+As mentioned above, file `setup.py` is not mandatory. It is not required if all setup configuration is static. But even in this case, it is still a good practice to have this file `setup.py` with simple contents as:
 
 ```python
 import setuptools
 setuptools.setup()
 ```
 
+More importantly, the package installation in development mode requires the existence of the file `setup.py`. This mode is quite useful in code development phase, although not required in package installation.
+
+### `pip install .` vs `python setup.py install`
+To install a `python` package from the source, the `pip` command is
+```bash
+pip install <path_to_package>
+```
+where `<path_to_package>` folder contains the source code and required setup files as shown above. The development mode can be launched with option `-e` as `pip install -e <path_to_package>`.
+
+Alternative command to build a package from the source is `python install setup.py`. But `pip install` is a better solution since `pip` is a standard tool to manage and resolve package dependence.
+
+
 ### install_requires vs requirement.txt
-`install_requires` is an option in `setup.cfg` to specify the dependent packages. Those dependent packages will be installed if not existent in the environment when installing package. `requirements.txt` is a text file to keep all dependent packages and to be able installed by command
+`install_requires` is an option in `setup.cfg` to specify the dependent packages. Those dependent packages will be installed if not existent in the environment when installing package. `requirements.txt` is a text file to keep a track of all dependent packages and to be able installed by `pip` command
 ```bash
 pip install -r requirements.txt
 ```
-But the packages in `requirements.txt` won't be automatically installed when run install package command like
-```bash
-pip install .
-```
 
-A good practice for the use of these two places to track package dependence is:
+Note that the packages in `requirements.txt` won't be automatically installed when running `pip` installation
+
+A good practice around the use of these two places to track package dependence is:
 - use `requirements.txt` to record exact version when package developed,
 - use `install_requires` to record compatible versions like `>=1.1.2` for package users;
 
 see an example at [requirements.txt](requirements.txt) and [setup.cfg](setup.cfg).
 
-In a data science pipeline, to enable reproducibility, it is critical to have `requirements.txt` track the exact version of all dependence.
+In a data science pipeline, to enable reproducibility, it is critical to have `requirements.txt` to track the exact version of all dependence.
 
 ### package data
 If a package requires data to come with, this can be specified at `setup.cfg` as
@@ -48,7 +62,7 @@ see [setup.cfg](setup.cfg) for an example. To load the data to the package code,
 
 
 ### entry point
-`setuptools` provides entry point mechanism to wrap function in the package into standalone CLI command in the installation process. One package can have multiple entry points, i.e., installation generates multiple CLI commands. The entry points can be defined at `setup.cfg`; see [setup.cfg](setup.cfg) for an example.
+`setuptools` provides entry point mechanism to wrap function in the package into standalone CLI command in the installation process. One package can have multiple entry points, i.e., installation creates multiple CLI commands. The entry points can be defined at `setup.cfg`; see [setup.cfg](setup.cfg) for an example.
 
 - The CLI commands generated will only exist in the environment where the package is installed.
 
@@ -60,7 +74,7 @@ if __name__ == '__main__':
     sys.exit(hello())
 ```
 
-- If the function takes parameters from `sys.args`, then corresponding CLI command created will follow; see [hello.py](simplemath/hello.py) for an simple implemented by `click`.
+- If the function takes parameters from `sys.args`, then corresponding CLI command created will follow; see [hello.py](simplemath/hello.py) for an simple implemented by package `click`.
 
 
 ### \_\_main\_\_ file
@@ -75,7 +89,7 @@ if __name__ == '__main__':
 ```
 The script block will be executed by `python -m <python_module>`. The file `__main__.py` is like the version for a package.
 
-This package has the feature of `__main__.py` implemented and invoked after installation as
+This package has the feature of `__main__.py` implemented and it can be invoked after installation by
 ```bash
 python -m simplemath
 ```
@@ -86,6 +100,6 @@ Package requires test module to ensure that all code pass quality standards. In 
 - `tox` - automatically create specified isolated environments, install required dependence and launch testing commands.
 - `pytest` - execute testing cases implemented in its framework.
 
-`tox` tool can be installed by running `pip install tox`. After the installation, command `tox` is supposed to run at the folder where it contains setup file (`setup.cfg`and/or `setup.py`) and `tox.ini`. The file `tox.ini` provides the configuration for `tox` execution. The command to invoke testing is also specified in `tox.ini` file; see [tox.ini](tox.ini) for an example.
+`tox` tool can be installed by running `pip install tox`. After the installation, command `tox` is supposed to run at the folder where it contains setup files and `tox.ini`. The file `tox.ini` provides the configuration for `tox` execution. The command to invoke testing is also specified in `tox.ini` file; see [tox.ini](tox.ini) for an example.
 
 In `tox.ini`, the dependency for running test can be provided. Note that the dependency given by `install_requires` in setup file will be automatically installed by `tox` into isolated testing environments as well.
