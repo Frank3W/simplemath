@@ -1,12 +1,19 @@
 # Simple Math
-This repo presents and demos how to build a `python` package to distribute and share with others via package installation. The key elements for creating an installable `python` package are covered. The good practices regarding those elements are discussed as well.
+This repo presents and demos how to make a `python` package installable in order to distribute and share with others. The key elements for creating an installable `python` package are covered. The good practices regarding those elements are discussed as well.
 
 This repo contains the source code of an installable `simplemath` package for demonstration purpose. This package can be installed by running the `pip` command at the root folder
 ```bash
 pip install .
 ```
 
-### setup files
+### Package declaration - \_\_init\_\_.py file
+`__init__.py` file is used to declare the folder that contains this file to be a `python` package. The `.py` files under the folder will be considered as `python` modules that can be imported after the package is installed (note that files starting with `__` are not considered as `python` modules.)
+
+The `python` code in `__init__.py` will be executed at the time the associated package (intermediate folder) is imported. The file `__init__.py` can be empty; in fact, this is for most cases. But setup or configuration regarding this package can be placed in this file.
+
+Prior to `python 3.3`, using `__init__.py` is the only way to declare a `python` package. But after `python 3.3`, an alternative way to create package is introduced; see [namespace package](https://docs.python.org/3/reference/import.html#regular-packages)
+
+### Package installability - setup files
 To make a package installable, it requires the existence of a combination of files from `setup.py`, `setpu.cfg` and `pyproject.toml` at the root folder of the repo. Those files provide the configuration for package installation.
 
 The following are two alternative minimal combinations required for installation:
@@ -27,7 +34,7 @@ setuptools.setup()
 
 More importantly, the package installation in development mode requires the existence of the file `setup.py`. This mode is quite useful in code development phase, although not required in package installation.
 
-### `pip install .` vs `python setup.py install`
+### Package installation - `pip install .` vs `python setup.py install`
 To install a `python` package from the source, the `pip` command is
 ```bash
 pip install <path_to_package>
@@ -37,7 +44,7 @@ where `<path_to_package>` folder contains the source code and required setup fil
 Alternative command to build a package from the source is `python install setup.py`. But `pip install` is a better solution since `pip` is a standard tool to manage and resolve package dependence.
 
 
-### install_requires vs requirement.txt
+### Package dependence - install_requires vs requirement.txt
 `install_requires` is an option in `setup.cfg` to specify the dependent packages. Those dependent packages will be installed if not existent in the environment when installing package. `requirements.txt` is a text file to keep a track of all dependent packages and to be able installed by `pip` command
 ```bash
 pip install -r requirements.txt
@@ -53,7 +60,7 @@ see an example at [requirements.txt](requirements.txt) and [setup.cfg](setup.cfg
 
 In a data science pipeline, to enable reproducibility, it is critical to have `requirements.txt` to track the exact version of all dependence.
 
-### package data
+### Package data
 If a package requires data to come with, this can be specified at `setup.cfg` as
 - In [options] section, `include_package_data = True`
 - In [options.package_data] section, declare location of the data files relative to the root folder that contains `setup.cfg`
@@ -61,7 +68,7 @@ If a package requires data to come with, this can be specified at `setup.cfg` as
 see [setup.cfg](setup.cfg) for an example. To load the data to the package code, the package `pkg_resources` distributed with `setuptools` plays a role; see [print_numbers.py](simplemath/print_numbers.py) for an example.
 
 
-### entry point
+### Package CLI - entry point
 `setuptools` provides entry point mechanism to wrap function in the package into standalone CLI command in the installation process. One package can have multiple entry points, i.e., installation creates multiple CLI commands. The entry points can be defined at `setup.cfg`; see [setup.cfg](setup.cfg) for an example.
 
 - The CLI commands generated will only exist in the environment where the package is installed.
@@ -76,8 +83,7 @@ if __name__ == '__main__':
 
 - If the function takes parameters from `sys.args`, then corresponding CLI command created will follow; see [hello.py](simplemath/hello.py) for an simple implemented by package `click`.
 
-
-### \_\_main\_\_ file
+### Package execution - \_\_main\_\_.py file
 To be able to run a command like
 ```bash
 python -m <packagename>
@@ -94,7 +100,7 @@ This package has the feature of `__main__.py` implemented and it can be invoked 
 python -m simplemath
 ```
 
-### package test
+### Package testing
 Package requires test module to ensure that all code pass quality standards. In package installation, testing component is not mandatory. But it is a good (in fact, must-have) practice to get installed package tested in different environments before distribution. This process contains two logic parts that can fulfilled by two commonly used `python` tools:
 
 - `tox` - automatically create specified isolated environments, install required dependence and launch testing commands.
@@ -103,3 +109,5 @@ Package requires test module to ensure that all code pass quality standards. In 
 `tox` tool can be installed by running `pip install tox`. After the installation, command `tox` is supposed to run at the folder where it contains setup files and `tox.ini`. The file `tox.ini` provides the configuration for `tox` execution. The command to invoke testing is also specified in `tox.ini` file; see [tox.ini](tox.ini) for an example.
 
 In `tox.ini`, the dependency for running test can be provided. Note that the dependency given by `install_requires` in setup file will be automatically installed by `tox` into isolated testing environments as well.
+
+The execution of these two logic components for testing can occur on remote CI/CD server, in particular, by the services integrated with Github code repo where the package source code sit.
