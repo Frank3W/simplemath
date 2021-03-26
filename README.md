@@ -9,9 +9,9 @@ pip install .
 ### Package declaration - \_\_init\_\_.py file
 `__init__.py` file is used to declare the folder that contains this file to be a `python` package. The `.py` files under the folder will be considered as `python` modules that can be imported after the package is installed (note that files starting with `__` are not considered as `python` modules.)
 
-The `python` code in `__init__.py` will be executed at the time the associated package (intermediate folder) is imported. The file `__init__.py` can be empty; in fact, this is for most cases. But setup or configuration regarding this package can be placed in this file.
+The `python` code in `__init__.py` will be executed at the time the associated package (immediate parent folder) is imported. The file `__init__.py` can be empty; in fact, this is for most cases. But setup or configuration regarding this package can be placed in this file.
 
-Prior to `python 3.3`, using `__init__.py` is the only way to declare a `python` package. But after `python 3.3`, an alternative way to create package is introduced; see [namespace package](https://docs.python.org/3/reference/import.html#regular-packages)
+Prior to `python 3.3`, using `__init__.py` is the only way to declare a `python` package. Since `python 3.3`, an alternative way to create package is introduced; see [namespace package](https://docs.python.org/3/reference/import.html#namespace-packages)
 
 ### Package installability - setup files
 To make a package installable, it requires the existence of a combination of files from `setup.py`, `setpu.cfg` and `pyproject.toml` at the root folder of the repo. Those files provide the configuration for package installation.
